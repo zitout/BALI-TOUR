@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة تقسيط العمرة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            padding: 20px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container, .calculator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .login-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .login-option {
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .login-option:hover {
+            transform: translateY(-5px);
+        }
+
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .admin-panel {
+            display: none;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="login-container">
+        <h2 style="color: white; text-align: center; margin-bottom: 30px;">اختر نوع المستخدم</h2>
+        <div class="login-options">
+            <div class="login-option" onclick="selectUserType('customer')">
+                <h3 style="color: white;">زبون</h3>
+            </div>
+            <div class="login-option" onclick="selectUserType('admin')">
+                <h3 style="color: white;">مدير</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة كلمة المرور -->
+    <div id="passwordModal" class="password-modal">
+        <h3>أدخل كلمة المرور</h3>
+        <input type="password" id="adminPassword" placeholder="كلمة المرور">
+        <button onclick="checkPassword()">دخول</button>
+        <button onclick="cancelLogin()">إلغاء</button>
+    </div>
+
+    <!-- الحاسبة الرئيسية -->
+    <div id="calculatorScreen" class="calculator" style="display: none;">
+        <div id="adminPanel" class="admin-panel">
+            <h3 style="color: white; margin-bottom: 10px;">تحديد سعر العمرة</h3>
+            <input type="number" id="umrahPrice" placeholder="أدخل سعر العمرة للشخص" min="0">
+            <button onclick="savePrice()">حفظ السعر</button>
+        </div>
+
+        <div class="input-group">
+            <label>عدد الأشخاص:</label>
+            <select id="persons">
+                <option value="1">شخص واحد</option>
+                <option value="2">شخصين</option>
+                <option value="3">3 أشخاص</option>
+                <option value="4">4 أشخاص</option>
+                <option value="5">5 أشخاص</option>
+                <option value="6">6 أشخاص</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>عدد الأشهر:</label>
+            <select id="months">
+                <option value="3">3 أشهر</option>
+                <option value="4">4 أشهر</option>
+                <option value="5">5 أشهر</option>
+                <option value="6">6 أشهر</option>
+                <option value="7">7 أشهر</option>
+                <option value="8">8 أشهر</option>
+                <option value="9">9 أشهر</option>
+                <option value="10">10 أشهر</option>
+                <option value="11">11 شهر</option>
+                <option value="12">12 شهر</option>
+                <option value="13" selected>13 شهر</option>
+                <option value="14">14 شهر</option>
+                <option value="15">15 شهر</option>
+                <option value="16">16 شهر</option>
+                <option value="17">17 شهر</option>
+                <option value="18">18 شهر</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>التسبيق (اختياري):</label>
+            <input type="number" id="downpayment" placeholder="أدخل مبلغ التسبيق" min="0" value="0">
+        </div>
+
+        <div id="result">النتيجة ستظهر هنا</div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "2022";
+        const RATES = {
+            3: 0.2, 4: 0.22, 5: 0.24, 6: 0.27, 7: 0.3, 8: 0.34,
+            9: 0.38, 10: 0.42, 11: 0.46, 12: 0.5, 13: 0.52,
+            14: 0.57, 15: 0.62, 16: 0.67, 17: 0.72, 18: 0.77
+        };
+
+        let basePrice = localStorage.getItem('umrahPrice') || 0;
+
+        function selectUserType(type) {
+            if (type === 'admin') {
+                document.getElementById('passwordModal').style.display = 'block';
+            } else {
+                showCalculator('customer');
+            }
+        }
+
+        function checkPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                showCalculator('admin');
+                document.getElementById('passwordModal').style.display = 'none';
+            } else {
+                alert('كلمة المرور غير صحيحة');
+            }
+        }
+
+        function cancelLogin() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function showCalculator(userType) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('calculatorScreen').style.display = 'block';
+            if (userType === 'admin') {
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('umrahPrice').value = basePrice;
+            }
+            calculate();
+        }
+
+        function savePrice() {
+            const newPrice = parseInt(document.getElementById('umrahPrice').value);
+            if (newPrice > 0) {
+                basePrice = newPrice;
+                localStorage.setItem('umrahPrice', basePrice);
+                alert('تم حفظ السعر بنجاح');
+                calculate();
+            } else {
+                alert('الرجاء إدخال سعر صحيح');
+            }
+        }
+
+        function formatNumber(number) {
+            return number.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        }
+
+        function roundUpToNearest100(number) {
+            return Math.ceil(number / 100) * 100;
+        }
+
+        function calculate() {
+            const persons = parseInt(document.getElementById('persons').value);
+            const months = parseInt(document.getElementById('months').value);
+            const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+
+            if (!basePrice || basePrice <= 0) {
+                document.getElementById('result').innerHTML = 'لم يتم تحديد سعر العمرة بعد';
+                return;
+            }
+
+            const totalPrice = persons * basePrice;
+            
+            if (downpayment > totalPrice) {
+                document.getElementById('result').innerHTML = 'مبلغ التسبيق أكبر من السعر الإجمالي';
+                return;
+            }
+
+            const remainingAmount = totalPrice - downpayment;
+            let monthlyRate = RATES[months] || 0.17;
+
+            if (remainingAmount >= 200000) {
+                monthlyRate *= 0.8;
+            } else if (remainingAmount >= 100000) {
+                monthlyRate *= 0.9;
+            }
+
+            const totalWithProfit = remainingAmount * (1 + monthlyRate);
+            const monthlyPayment = roundUpToNearest100(totalWithProfit / months);
+
+            document.getElementById('result').innerHTML = `
+                عدد الأشخاص: ${persons} <br>
+                السعر الإجمالي: ${formatNumber(totalPrice)} <br>
+                القسط الشهري: ${formatNumber(monthlyPayment)} <br>
+                إجمالي المبلغ مع الربح: ${formatNumber(monthlyPayment * months)}
+            `;
+        }
+
+        // إضافة مستمعي الأحداث
+        document.querySelectorAll('select, input').forEach(element => {
+            element.addEventListener('change', calculate);
+        });
+    </script>
+</body>
+</html>
