@@ -56,13 +56,17 @@
                 <option value="16">16 شهر</option>
                 <option value="17">17 شهر</option>
                 <option value="18">18 شهر</option>
-            </select>
+           </select>
         </div>
-
-        <div class="input-group">
-            <label for="downpayment">التسبيق (اختياري):</label>
-            <input type="number" id="downpayment" placeholder="أدخل مبلغ التسبيق" min="0" value="0">
-        </div>
+       <div class="input-group">
+    <label for="downpayment">التسبيق (اختياري):</label>
+    <input type="number" 
+           id="downpayment" 
+           placeholder="أدخل مبلغ التسبيق" 
+           min="0" 
+           value="0"
+    >
+</div>
         
         <div class="result-box">
             <p id="result">النتيجة ستظهر هنا</p>
@@ -72,8 +76,11 @@
     <button class="reset-button" onclick="resetCalculator()">↺</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <!-- إضافة Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-</body>
+
+    </body>
 </html>
 
