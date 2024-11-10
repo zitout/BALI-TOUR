@@ -3,152 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="حاسبة تقسيط العمرة - احسب تكاليف رحلة العمرة بسهولة">
+    <meta name="theme-color" content="#23a6d5">
     <title>حاسبة تقسيط العمرة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-   
-
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <!-- Preload Fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" as="style">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap">
+    
+    <!-- Modern CSS with Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem;
-        font-family: 'Tajawal', sans-serif;
-        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-    }
-
-    @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    .login-container {
-        width: 100%;
-        max-width: 500px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        text-align: center;
-    }
-
-    .user-type-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin: 2rem 0;
-    }
-
-    .user-type-buttons button {
-        padding: 1rem 2rem;
-        font-size: 1.2rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, #90CAF9, #64B5F6);
-        color: white;
-        font-family: 'Tajawal', sans-serif;
-    }
-
-    .user-type-buttons button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .admin-login-form {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 2rem;
-        border-radius: 15px;
-        margin-top: 2rem;
-        display: none;
-    }
-
-    .admin-login-form input {
-        width: 100%;
-        max-width: 300px;
-        margin: 1rem auto;
-        padding: 12px;
-        border: 2px solid #E3F2FD;
-        border-radius: 10px;
-        font-size: 1.1rem;
-        text-align: center;
-        direction: ltr;
-    }
-
-    .admin-login-form button {
-        margin-top: 1rem;
-        padding: 0.8rem 2rem;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-family: 'Tajawal', sans-serif;
-    }
-
-    .admin-login-form button:hover {
-        background: #45a049;
-        transform: translateY(-2px);
-    }
-
-    @media (max-width: 480px) {
-        .login-container { padding: 1rem; }
-        .user-type-buttons {
-            flex-direction: column;
+        /* Base Styles with Modern CSS Features */
+        :root {
+            --primary-gradient: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
         }
-        .user-type-buttons button {
+
+        @property --gradient-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            font-family: 'Tajawal', sans-serif;
+            background: var(--primary-gradient);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .login-container {
             width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform: translateZ(0);
+            transition: transform 0.3s ease;
         }
-    }
-</style>
-    
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Modern Button Styles */
+        .btn {
+            @apply px-6 py-3 rounded-lg font-bold transition-all duration-300;
+            background: linear-gradient(135deg, #90CAF9, #64B5F6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #64B5F6, #90CAF9);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Modern Animations */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="background-animation">
-        <span style="left: 10%; top: 20%;"></span>
-        <span style="left: 30%; top: 40%;"></span>
-        <span style="left: 50%; top: 60%;"></span>
-        <span style="left: 70%; top: 80%;"></span>
-        <span style="left: 90%; top: 10%;"></span>
+    <!-- Visitor Counter with Modern Design -->
+    <div id="visitorCount" class="fixed top-4 right-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white font-bold shadow-lg">
+        <span class="visitors">0</span> زائر
     </div>
 
-    <div id="visitorCount" class="visitor-count">0</div>
-
-    <div class="login-container">
-        <h2>حاسبة تقسيط العمرة</h2>
+    <main class="login-container">
+        <h1 class="text-3xl font-bold text-white mb-8 text-center">حاسبة تقسيط العمرة</h1>
         
-        <div class="user-type-buttons">
-            <button onclick="redirectToCustomer()">دخول كزبون</button>
-          <button onclick="window.location.href='admin.html'">دخول كمدير</button>
+        <div class="flex flex-col gap-4">
+            <button onclick="redirectToCustomer()" class="btn text-white">
+                دخول كزبون
+            </button>
+            <button onclick="window.location.href='admin.html'" class="btn text-white">
+                دخول كمدير
+            </button>
         </div>
 
-        <div id="adminLoginForm" class="admin-login-form" style="display: none;">
-            <h3>تسجيل دخول المدير</h3>
-            <div class="input-group">
-                <label for="adminPassword">كلمة المرور:</label>
-                <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور">
+        <!-- Admin Login Form with Modern Styling -->
+        <div id="adminLoginForm" class="hidden mt-8 bg-white/10 backdrop-blur-md rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4">تسجيل دخول المدير</h2>
+            <div class="space-y-4">
+                <input 
+                    type="password" 
+                    id="adminPassword"
+                    class="w-full px-4 py-2 rounded-lg border-2 border-transparent focus:border-blue-400 outline-none transition-all duration-300"
+                    placeholder="أدخل كلمة المرور"
+                >
+                <button 
+                    onclick="checkAdminPassword()"
+                    class="w-full btn text-white"
+                >
+                    دخول
+                </button>
             </div>
-            <button onclick="checkAdminPassword()">دخول</button>
         </div>
-    </div>
+    </main>
 
-    <!-- إضافة Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- Modern Script Loading -->
+    <script type="module">
+        // Import Firebase using ES modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getDatabase, ref, onValue, runTransaction } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
 
-    <script>
-        // تكوين Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDEQLPyt8Wp0oA5pvgKz93dczqYsBNDpvY",
             authDomain: "omrati-453e1.firebaseapp.com",
@@ -160,29 +159,53 @@
             measurementId: "G-RM7T583FYY"
         };
 
-        // تهيئة Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-        // دالة التوجيه لصفحة الزبون
-        function redirectToCustomer() {
-            window.location.href = 'customer.html';
-        }
+        // Modern Visitor Counter Implementation
+        const incrementVisitorCount = async () => {
+            const visitorId = localStorage.getItem('visitorId');
+            if (!visitorId) {
+                const newVisitorId = Date.now().toString();
+                localStorage.setItem('visitorId', newVisitorId);
+                
+                const visitorRef = ref(database, 'visitorCount');
+                await runTransaction(visitorRef, (currentCount) => {
+                    return (currentCount || 0) + 1;
+                });
+            }
+            displayVisitorCount();
+        };
 
-        // دالة إظهار نموذج تسجيل دخول المدير
-        function showAdminLogin() {
-            const adminLoginForm = document.getElementById('adminLoginForm');
-            adminLoginForm.style.display = 'block';
-            gsap.from('#adminLoginForm', {
-                duration: 0.5,
-                opacity: 0,
-                y: -20,
-                ease: 'power3.out'
+        const displayVisitorCount = () => {
+            const visitorRef = ref(database, 'visitorCount');
+            onValue(visitorRef, (snapshot) => {
+                document.querySelector('.visitors').textContent = snapshot.val();
+            });
+        };
+
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('ServiceWorker registered'))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
             });
         }
 
-        // دالة التحقق من كلمة مرور المدير
-        function checkAdminPassword() {
+        // Event Listeners
+        window.addEventListener('load', () => {
+            incrementVisitorCount();
+            displayVisitorCount();
+        });
+
+        // Expose necessary functions to window
+        window.redirectToCustomer = () => {
+            window.location.href = 'customer.html';
+        };
+
+        window.checkAdminPassword = () => {
             const password = document.getElementById('adminPassword').value;
             if (password === '2022') {
                 sessionStorage.setItem('adminLoggedIn', 'true');
@@ -191,43 +214,7 @@
                 alert('كلمة المرور غير صحيحة');
                 document.getElementById('adminPassword').value = '';
             }
-        }
-
-        // إضافة مستمع لمفتاح Enter
-        document.getElementById('adminPassword').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                checkAdminPassword();
-            }
-        });
-
-        // دوال عداد الزوار
-        function incrementVisitorCount() {
-            const visitorId = localStorage.getItem('visitorId');
-            if (!visitorId) {
-                const newVisitorId = Date.now().toString();
-                localStorage.setItem('visitorId', newVisitorId);
-                
-                const visitorRef = database.ref('visitorCount');
-                visitorRef.transaction((currentCount) => {
-                    return (currentCount || 0) + 1;
-                });
-            }
-            displayVisitorCount();
-        }
-
-        function displayVisitorCount() {
-            const visitorRef = database.ref('visitorCount');
-            visitorRef.on('value', (snapshot) => {
-                document.getElementById('visitorCount').textContent = snapshot.val();
-            });
-        }
-
-        // تحميل الصفحة
-        window.addEventListener('load', () => {
-            incrementVisitorCount();
-            displayVisitorCount();
-        });
+        };
     </script>
 </body>
 </html>
-
