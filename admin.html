@@ -351,27 +351,74 @@
             cursor: pointer;
         }
 
+    .login-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.login-box input {
+    width: 250px;
+    padding: 10px;
+    margin: 1rem 0;
+    border: 2px solid #E3F2FD;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    text-align: center;
+    direction: ltr;
+}
+
+.login-box button {
+    padding: 10px 30px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    transition: all 0.3s;
+}
+
+.login-box button:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
     
 </style>
     
 </head>
-
-    <!-- إضافة هذا الكود مباشرة في البداية -->
-    <script>
-        if (!sessionStorage.getItem('adminLoggedIn')) {
-            window.location.replace('index.html');
-        }
-    </script>
-  
     
 <body>
 
-        <!-- صفحة التحقق -->
-    <div id="authPage" class="auth-container">
-        <h2>تحقق من كلمة المرور</h2>
-        <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور">
-        <button onclick="checkPassword()">دخول</button>
+    <div id="loginPage" class="login-page">
+    <div class="login-box">
+        <h2>تسجيل دخول المدير</h2>
+        <div class="input-group">
+            <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور">
+            <button onclick="checkPassword()">دخول</button>
+        </div>
     </div>
+</div>
+
+     <div id="adminContent" style="display: none;">
+       
 
 
     
@@ -384,7 +431,7 @@
     </div>
 
     <div id="visitorCount" class="visitor-count">0</div>
-    <div id="adminContent" style="display: none;">
+   
 
     <div class="calculator">
         <h2>لوحة تحكم المدير - حاسبة تقسيط العمرة</h2>
@@ -456,19 +503,32 @@
 
 <script>
 
-        // إضافة في بداية الكود
-    window.history.pushState(null, '', window.location.href);
-    window.onpopstate = function() {
-        window.history.pushState(null, '', window.location.href);
-    };
+     function checkPassword() {
+    const password = document.getElementById('adminPassword').value;
+    if (password === '2022') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        initializePage(); // دالة لتهيئة صفحة المدير
+    } else {
+        alert('كلمة المرور غير صحيحة');
+        document.getElementById('adminPassword').value = '';
+    }
+}
 
+// إضافة مستمع لمفتاح Enter
+document.getElementById('adminPassword').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        checkPassword();
+    }
+});
+
+// دالة تهيئة الصفحة
+function initializePage() {
+    initAnimations();
+    incrementVisitorCount();
+    displayVisitorCount();
+}
     
-        document.addEventListener('DOMContentLoaded', function() {
-        if (!sessionStorage.getItem('adminLoggedIn')) {
-            window.location.replace('index.html');
-            return;
-        }
-
 
 
     // تكوين Firebase
@@ -487,18 +547,7 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-                    // دالة التحقق من كلمة المرور
-        function checkPassword() {
-            const password = document.getElementById('passwordInput').value;
-            if (password === '2022') {
-                document.getElementById('authPage').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                initializeAdminPage(); // تهيئة صفحة المدير
-            } else {
-                alert('كلمة المرور غير صحيحة');
-                document.getElementById('passwordInput').value = '';
-            }
-        }
+             
 
         // عند تحميل الصفحة
         window.onload = function() {
