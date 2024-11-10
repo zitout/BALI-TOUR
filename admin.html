@@ -468,7 +468,24 @@
         }
     });
 
-    function calculate() {
+ // Event Listeners
+document.querySelector('.calculator').addEventListener('change', function(event) {
+    if (event.target.matches('select, input')) {
+        calculate();
+    }
+});
+
+// إضافة مستمع لحقل سعر العمرة
+document.getElementById('umrahPrice').addEventListener('input', calculate);
+
+window.addEventListener('load', () => {
+    incrementVisitorCount();
+    displayVisitorCount();
+    initAnimations();
+});
+
+// تحديث دالة calculate
+function calculate() {
     const resultBox = document.querySelector('.result-box');
     resultBox.classList.add('loading');
     
@@ -506,18 +523,6 @@
 
         const totalWithProfit = remainingAmount * (1 + monthlyRate);
         const regularMonthlyPayment = roundUpToNearest100(Math.floor(totalWithProfit / months));
-        const lastMonthPayment = roundUpToNearest100(totalWithProfit - (regularMonthlyPayment * (months - 1)));
-
-        // حفظ البيانات في Firebase
-        saveCalculation({
-            umrahPrice,
-            persons,
-            months,
-            downpayment,
-            regularMonthlyPayment,
-            totalAmount: regularMonthlyPayment * months,
-            timestamp: new Date().toISOString()
-        });
 
         // عرض النتائج
         resultBox.classList.remove('loading');
@@ -533,8 +538,22 @@
             القسط الشهري: ${formatNumber(regularMonthlyPayment)} <br>
             إجمالي المبلغ مع الربح: ${formatNumber(regularMonthlyPayment * months)}
         `;
+
+        // حفظ البيانات في Firebase
+        saveCalculation({
+            umrahPrice,
+            persons,
+            months,
+            downpayment,
+            regularMonthlyPayment,
+            totalAmount: regularMonthlyPayment * months,
+            timestamp: new Date().toISOString()
+        });
     }, 300);
 }
+    
+
+       
 
 // دالة حفظ الحسابات في Firebase
 function saveCalculation(data) {
@@ -550,6 +569,20 @@ function saveCalculation(data) {
         document.getElementById('result').innerHTML = 'النتيجة ستظهر هنا';
         calculate();
     }
+    // إضافة دالة عداد الزوار
+function incrementVisitorCount() {
+    const visitorId = localStorage.getItem('visitorId');
+    if (!visitorId) {
+        const newVisitorId = Date.now().toString();
+        localStorage.setItem('visitorId', newVisitorId);
+        
+        const visitorRef = database.ref('visitorCount');
+        visitorRef.transaction((currentCount) => {
+            return (currentCount || 0) + 1;
+        });
+    }
+    displayVisitorCount();
+}
 
    // دالة لعرض عدد الزيارات
         function displayVisitorCount() {
@@ -587,12 +620,7 @@ function changeColor() {
 setInterval(changeColor, 3000);
 
         
-         // Event Listeners
-    document.querySelector('.calculator').addEventListener('change', function(event) {
-        if (event.target.matches('select, input')) {
-            calculate();
-        }
-    });
+        
 
             input.addEventListener('blur', () => {
                 input.parentElement.style.transform = 'translateZ(20px)';
