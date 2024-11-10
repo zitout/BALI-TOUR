@@ -440,9 +440,9 @@
         return Math.ceil(number / 100) * 100;
     }
 
-    function formatNumber(number) {
-        return number.toLocaleString('ar-SA');
-    }
+ function formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
     // دالة الحساب الرئيسية
     function calculate() {
