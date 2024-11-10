@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>حاسبة تقسيط العمرة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+   
 
-   <style>
+    <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
@@ -126,13 +127,11 @@
     <div class="login-container">
         <h2>حاسبة تقسيط العمرة</h2>
         
-        <!-- أزرار اختيار نوع المستخدم -->
         <div class="user-type-buttons">
             <button onclick="redirectToCustomer()">دخول كزبون</button>
             <button onclick="showAdminLogin()">دخول كمدير</button>
         </div>
 
-        <!-- نموذج تسجيل دخول المدير (مخفي افتراضياً) -->
         <div id="adminLoginForm" class="admin-login-form" style="display: none;">
             <h3>تسجيل دخول المدير</h3>
             <div class="input-group">
@@ -149,7 +148,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
     <script>
-      <script>
         // تكوين Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDEQLPyt8Wp0oA5pvgKz93dczqYsBNDpvY",
@@ -166,130 +164,68 @@
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-
-    // دالة التوجيه لصفحة الزبون
-    function redirectToCustomer() {
-        window.location.href = 'customer.html';
-    }
-
-    // دالة إظهار نموذج تسجيل دخول المدير
-    function showAdminLogin() {
-        document.getElementById('adminLoginForm').style.display = 'block';
-        gsap.from('#adminLoginForm', {
-            duration: 0.5,
-            opacity: 0,
-            y: -20,
-            ease: 'power3.out'
-        });
-    }
-
-    // دالة التحقق من كلمة مرور المدير
-    function checkAdminPassword() {
-        const password = document.getElementById('adminPassword').value;
-        if (password === '2022') {
-            // تخزين حالة تسجيل الدخول
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            window.location.href = 'admin.html';
-        } else {
-            alert('كلمة المرور غير صحيحة');
-            document.getElementById('adminPassword').value = '';
+        // دالة التوجيه لصفحة الزبون
+        function redirectToCustomer() {
+            window.location.href = 'customer.html';
         }
-    }
 
-    // إضافة مستمع لمفتاح Enter في حقل كلمة المرور
-    document.getElementById('adminPassword').addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            checkAdminPassword();
+        // دالة إظهار نموذج تسجيل دخول المدير
+        function showAdminLogin() {
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            adminLoginForm.style.display = 'block';
+            gsap.from('#adminLoginForm', {
+                duration: 0.5,
+                opacity: 0,
+                y: -20,
+                ease: 'power3.out'
+            });
         }
-    });
 
-    // التحقق من حالة تسجيل الدخول عند تحميل admin.html
-    function checkAdminAuth() {
-        if (!sessionStorage.getItem('adminLoggedIn')) {
-            window.location.href = 'index.html';
+        // دالة التحقق من كلمة مرور المدير
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === '2022') {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                window.location.href = 'admin.html';
+            } else {
+                alert('كلمة المرور غير صحيحة');
+                document.getElementById('adminPassword').value = '';
+            }
         }
-    }
 
-   // دالة لزيادة عدد الزيارات
-        function incrementVisitorCount() {
-    const visitorId = localStorage.getItem('visitorId');
-    if (!visitorId) {
-        // إذا لم يكن هناك معرف للزائر، قم بإنشاء واحد جديد
-        const newVisitorId = Date.now().toString();
-        localStorage.setItem('visitorId', newVisitorId);
-        
-        const visitorRef = database.ref('visitorCount');
-        visitorRef.transaction((currentCount) => {
-            return (currentCount || 0) + 1;
-        }, (error, committed, snapshot) => {
-            if (error) {
-                console.error('فشل تحديث العدّاد:', error);
-            } else if (committed) {
-                document.getElementById('visitorCount').textContent = snapshot.val();
+        // إضافة مستمع لمفتاح Enter
+        document.getElementById('adminPassword').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkAdminPassword();
             }
         });
-    } else {
-        // إذا كان هناك معرف للزائر، فقط قم بعرض العدد الحالي
-        displayVisitorCount();
-    }
-}
 
-        // دالة لعرض عدد الزيارات
+        // دوال عداد الزوار
+        function incrementVisitorCount() {
+            const visitorId = localStorage.getItem('visitorId');
+            if (!visitorId) {
+                const newVisitorId = Date.now().toString();
+                localStorage.setItem('visitorId', newVisitorId);
+                
+                const visitorRef = database.ref('visitorCount');
+                visitorRef.transaction((currentCount) => {
+                    return (currentCount || 0) + 1;
+                });
+            }
+            displayVisitorCount();
+        }
+
         function displayVisitorCount() {
             const visitorRef = database.ref('visitorCount');
             visitorRef.on('value', (snapshot) => {
                 document.getElementById('visitorCount').textContent = snapshot.val();
-            }, (error) => {
-                console.error('فشل جلب عدد الزيارات:', error);
             });
         }
 
-        // تأثيرات حركية باستخدام GSAP
-        function initAnimations() {
-            gsap.from('.calculator', {duration: 1, opacity: 0, y: 50, ease: 'power3.out'});
-            gsap.from('.input-group', {duration: 0.8, opacity: 0, y: 20, stagger: 0.2, ease: 'power3.out'});
-            gsap.from('.result-box', {duration: 1, opacity: 0, scale: 0.9, ease: 'elastic.out(1, 0.5)', delay: 0.5});
-            gsap.from('.visitor-count', {duration: 1, opacity: 0, x: -50, ease: 'power3.out', delay: 1});
-        }
-
-        // Event Listeners
-        document.querySelector('.calculator').addEventListener('change', function(event) {
-            if (event.target.matches('select, input')) {
-                calculate();
-            }
-        });
-
-
-
-function changeColor() {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    document.getElementById('visitorCount').style.backgroundColor = randomColor;
-}
-
-setInterval(changeColor, 3000);
-
-        
-        // تأثيرات حركية للمدخلات
-        const inputs = document.querySelectorAll('select, input');
-        inputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                input.parentElement.style.transform = 'translateZ(30px)';
-            });
-            
-            input.addEventListener('blur', () => {
-                input.parentElement.style.transform = 'translateZ(20px)';
-            });
-        });
-
-        // إضافة مستمع الحدث لعنصر نوع الرحلة
-        document.getElementById('flightType').addEventListener('change', calculate);
-
+        // تحميل الصفحة
         window.addEventListener('load', () => {
-            calculate();
             incrementVisitorCount();
             displayVisitorCount();
-            initAnimations();
         });
     </script>
 </body>
