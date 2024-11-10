@@ -407,19 +407,12 @@
 </html>
 
 <script>
-
-        // التحقق من تسجيل دخول المدير
+    // التحقق من تسجيل دخول المدير
     if (!sessionStorage.getItem('adminLoggedIn')) {
         window.location.href = 'index.html';
     }
 
-    // دالة تسجيل الخروج
-    function logout() {
-        sessionStorage.removeItem('adminLoggedIn');
-        window.location.href = 'index.html';
-    }
-
-    // نفس تكوين Firebase
+    // تكوين Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDEQLPyt8Wp0oA5pvgKz93dczqYsBNDpvY",
         authDomain: "omrati-453e1.firebaseapp.com",
@@ -431,27 +424,111 @@
         measurementId: "G-RM7T583FYY"
     };
 
+    // تهيئة Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // معدلات الربح حسب عدد الأشهر
+    // معدلات الربح
     const RATES = {
-        1: 0.17, 2: 0.17, 3: 0.2, 4: 0.22, 5: 0.24,
-        6: 0.27, 7: 0.3, 8: 0.34, 9: 0.38, 10: 0.42,
-        11: 0.46, 12: 0.5, 13: 0.52, 14: 0.57, 15: 0.62,
-        16: 0.67, 17: 0.72, 18: 0.77
+        3: 0.2, 4: 0.22, 5: 0.24, 6: 0.27, 7: 0.3, 8: 0.34,
+        9: 0.38, 10: 0.42, 11: 0.46, 12: 0.5, 13: 0.52,
+        14: 0.57, 15: 0.62, 16: 0.67, 17: 0.72, 18: 0.77
     };
 
+    // الدوال المساعدة
     function roundUpToNearest100(number) {
         return Math.ceil(number / 100) * 100;
     }
 
     function formatNumber(number) {
-        return number.toLocaleString('en-US', {
-            useGrouping: true,
-            maximumFractionDigits: 0
+        return number.toLocaleString('ar-SA');
+    }
+
+    // دالة الحساب الرئيسية
+    function calculate() {
+        const resultBox = document.querySelector('.result-box');
+        resultBox.classList.add('loading');
+        
+        const umrahPrice = parseFloat(document.getElementById('umrahPrice').value) || 0;
+        const persons = parseInt(document.getElementById('persons').value);
+        const months = parseInt(document.getElementById('months').value);
+        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+
+        if (umrahPrice <= 0) {
+            document.getElementById('result').innerHTML = 'الرجاء إدخال سعر صحيح للعمرة';
+            resultBox.classList.remove('loading');
+            return;
+        }
+
+        const totalPrice = umrahPrice * persons;
+
+        if (downpayment > totalPrice) {
+            document.getElementById('result').innerHTML = 'مبلغ التسبيق أكبر من السعر الإجمالي';
+            resultBox.classList.remove('loading');
+            return;
+        }
+
+        const remainingAmount = totalPrice - downpayment;
+        let monthlyRate = RATES[months];
+
+        if (remainingAmount >= 200000) {
+            monthlyRate *= 0.8;
+        } else if (remainingAmount >= 100000) {
+            monthlyRate *= 0.9;
+        }
+
+        const totalWithProfit = remainingAmount * (1 + monthlyRate);
+        const regularMonthlyPayment = roundUpToNearest100(Math.floor(totalWithProfit / months));
+
+        resultBox.classList.remove('loading');
+        resultBox.classList.remove('pulse');
+        void resultBox.offsetWidth;
+        resultBox.classList.add('pulse');
+
+        document.getElementById('result').innerHTML = `
+            سعر العمرة للشخص: ${formatNumber(umrahPrice)} <br>
+            عدد الأشخاص: ${persons}<br>
+            المبلغ الإجمالي: ${formatNumber(totalPrice)} <br>
+            التسبيق: ${formatNumber(downpayment)} <br>
+            القسط الشهري: ${formatNumber(regularMonthlyPayment)} <br>
+            إجمالي المبلغ مع الربح: ${formatNumber(regularMonthlyPayment * months)} 
+        `;
+
+        saveCalculation({
+            umrahPrice,
+            persons,
+            months,
+            downpayment,
+            regularMonthlyPayment,
+            totalAmount: regularMonthlyPayment * months,
+            timestamp: new Date().toISOString()
         });
     }
+
+    // دوال إضافية
+    function logout() {
+        sessionStorage.removeItem('adminLoggedIn');
+        window.location.href = 'index.html';
+    }
+
+    function resetCalculator() {
+        document.getElementById('umrahPrice').value = '';
+        document.getElementById('persons').value = '1';
+        document.getElementById('months').value = '13';
+        document.getElementById('downpayment').value = '0';
+        document.getElementById('result').innerHTML = 'النتيجة ستظهر هنا';
+    }
+
+    function saveCalculation(data) {
+        const calculationsRef = database.ref('calculations');
+        calculationsRef.push(data);
+    }
+
+    // مستمعات الأحداث
+    document.getElementById('umrahPrice').addEventListener('input', calculate);
+    document.getElementById('persons').addEventListener('change', calculate);
+    document.getElementById('months').addEventListener('change', calculate);
+    document.getElementById('downpayment').addEventListener('input', calculate);
 
     // معالجة حقل التسبيق
     const downpaymentInput = document.getElementById('downpayment');
@@ -468,175 +545,14 @@
         }
     });
 
- // Event Listeners
-document.querySelector('.calculator').addEventListener('change', function(event) {
-    if (event.target.matches('select, input')) {
-        calculate();
-    }
-});
+    // تهيئة الصفحة
+    window.addEventListener('load', () => {
+        initAnimations();
+        incrementVisitorCount();
+        displayVisitorCount();
+    });
+</script>
 
-// إضافة مستمع لحقل سعر العمرة
-document.getElementById('umrahPrice').addEventListener('input', calculate);
-
-window.addEventListener('load', () => {
-    incrementVisitorCount();
-    displayVisitorCount();
-    initAnimations();
-});
-
-// تحديث دالة calculate
-function calculate() {
-    const resultBox = document.querySelector('.result-box');
-    resultBox.classList.add('loading');
-    
-    setTimeout(() => {
-        const umrahPrice = parseFloat(document.getElementById('umrahPrice').value) || 0;
-        const persons = parseInt(document.getElementById('persons').value);
-        const months = parseInt(document.getElementById('months').value);
-        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
-
-        // التحقق من إدخال السعر
-        if (umrahPrice <= 0) {
-            document.getElementById('result').innerHTML = 'الرجاء إدخال سعر صحيح للعمرة';
-            resultBox.classList.remove('loading');
-            return;
-        }
-
-        const totalPrice = umrahPrice * persons;
-
-        // التحقق من التسبيق
-        if (downpayment > totalPrice) {
-            document.getElementById('result').innerHTML = 'مبلغ التسبيق أكبر من السعر الإجمالي';
-            resultBox.classList.remove('loading');
-            return;
-        }
-
-        const remainingAmount = totalPrice - downpayment;
-        let monthlyRate = RATES[months] || 0.17;
-
-        // تطبيق الخصومات حسب المبلغ
-        if (remainingAmount >= 200000) {
-            monthlyRate *= 0.8; // خصم 20% على المعدل للمبالغ الكبيرة
-        } else if (remainingAmount >= 100000) {
-            monthlyRate *= 0.9; // خصم 10% على المعدل للمبالغ المتوسطة
-        }
-
-        const totalWithProfit = remainingAmount * (1 + monthlyRate);
-        const regularMonthlyPayment = roundUpToNearest100(Math.floor(totalWithProfit / months));
-
-        // عرض النتائج
-        resultBox.classList.remove('loading');
-        resultBox.classList.remove('pulse');
-        void resultBox.offsetWidth;
-        resultBox.classList.add('pulse');
-
-        document.getElementById('result').innerHTML = `
-            سعر العمرة للشخص: ${formatNumber(umrahPrice)} <br>
-            عدد الأشخاص: ${persons} <br>
-            المبلغ الإجمالي: ${formatNumber(totalPrice)} <br>
-            التسبيق: ${formatNumber(downpayment)} <br>
-            القسط الشهري: ${formatNumber(regularMonthlyPayment)} <br>
-            إجمالي المبلغ مع الربح: ${formatNumber(regularMonthlyPayment * months)}
-        `;
-
-        // حفظ البيانات في Firebase
-        saveCalculation({
-            umrahPrice,
-            persons,
-            months,
-            downpayment,
-            regularMonthlyPayment,
-            totalAmount: regularMonthlyPayment * months,
-            timestamp: new Date().toISOString()
-        });
-    }, 300);
-}
-    
-
-       
-
-// دالة حفظ الحسابات في Firebase
-function saveCalculation(data) {
-    const calculationsRef = database.ref('calculations');
-    calculationsRef.push(data);
-}
-    
-    function resetCalculator() {
-        document.getElementById('umrahPrice').value = '';
-        document.getElementById('persons').value = '1';
-        document.getElementById('months').value = '13';
-        document.getElementById('downpayment').value = '0';
-        document.getElementById('result').innerHTML = 'النتيجة ستظهر هنا';
-        calculate();
-    }
-    // إضافة دالة عداد الزوار
-function incrementVisitorCount() {
-    const visitorId = localStorage.getItem('visitorId');
-    if (!visitorId) {
-        const newVisitorId = Date.now().toString();
-        localStorage.setItem('visitorId', newVisitorId);
-        
-        const visitorRef = database.ref('visitorCount');
-        visitorRef.transaction((currentCount) => {
-            return (currentCount || 0) + 1;
-        });
-    }
-    displayVisitorCount();
-}
-
-   // دالة لعرض عدد الزيارات
-        function displayVisitorCount() {
-            const visitorRef = database.ref('visitorCount');
-            visitorRef.on('value', (snapshot) => {
-                document.getElementById('visitorCount').textContent = snapshot.val();
-            }, (error) => {
-                console.error('فشل جلب عدد الزيارات:', error);
-            });
-        }
-
-        // تأثيرات حركية باستخدام GSAP
-        function initAnimations() {
-            gsap.from('.calculator', {duration: 1, opacity: 0, y: 50, ease: 'power3.out'});
-            gsap.from('.input-group', {duration: 0.8, opacity: 0, y: 20, stagger: 0.2, ease: 'power3.out'});
-            gsap.from('.result-box', {duration: 1, opacity: 0, scale: 0.9, ease: 'elastic.out(1, 0.5)', delay: 0.5});
-            gsap.from('.visitor-count', {duration: 1, opacity: 0, x: -50, ease: 'power3.out', delay: 1});
-        }
-
-        // Event Listeners
-        document.querySelector('.calculator').addEventListener('change', function(event) {
-            if (event.target.matches('select, input')) {
-                calculate();
-            }
-        });
-
-
-
-function changeColor() {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    document.getElementById('visitorCount').style.backgroundColor = randomColor;
-}
-
-setInterval(changeColor, 3000);
-
-        
-        
-
-            input.addEventListener('blur', () => {
-                input.parentElement.style.transform = 'translateZ(20px)';
-            });
-        });
-
-        // إضافة مستمع الحدث لعنصر نوع الرحلة
-        document.getElementById('flightType').addEventListener('change', calculate);
-
-        window.addEventListener('load', () => {
-            calculate();
-            incrementVisitorCount();
-            displayVisitorCount();
-            initAnimations();
-        });
-    </script>
 </body>
 </html>
 
