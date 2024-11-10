@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة تقسيط العمرة - تسجيل الدخول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-animation">
+        <span style="left: 10%; top: 20%;"></span>
+        <span style="left: 30%; top: 40%;"></span>
+        <span style="left: 50%; top: 60%;"></span>
+        <span style="left: 70%; top: 80%;"></span>
+        <span style="left: 90%; top: 10%;"></span>
+    </div>
+
+   <div id="visitorCount" class="visitor-count">0</div>
+
+    <div class="calculator">
+        <h2>حاسبة تقسيط العمرة</h2>
+        <div class="input-group">
+            <label for="flightType">نوع الرحلة:</label>
+            <select id="flightType">
+                <option value="direct">مباشر</option>
+                <option value="indirect">غير مباشر</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="persons">عدد الأشخاص:</label>
+            <select id="persons">
+                <option value="1">شخص واحد</option>
+                <option value="2">شخصين</option>
+                <option value="3">3 أشخاص</option>
+                <option value="4">4 أشخاص</option>
+                <option value="5">5 أشخاص</option>
+                <option value="6">6 أشخاص</option>
+            </select>
+        </div>
+      <div class="input-group">
+    <label for="roomType">نوع الغرفة:</label>
+    <select id="roomType">
+        <option value="shared">غرفة جماعية</option>
+        <option value="quadruple">غرفة رباعية</option>
+        <option value="triple">غرفة ثلاثية</option>
+        <option value="double">غرفة ثنائية</option>
+        <option value="single">غرفة فردية</option>
+    </select>
+</div>
+        <div class="input-group">
+            <label for="months">عدد الأشهر:</label>
+            <select id="months">
+                <option value="3">3 أشهر</option>
+                <option value="4">4 أشهر</option>
+                <option value="5">5 أشهر</option>
+                <option value="6">6 أشهر</option>
+                <option value="7">7 أشهر</option>
+                <option value="8">8 أشهر</option>
+                <option value="9">9 أشهر</option>
+                <option value="10">10 أشهر</option>
+                <option value="11">11 شهر</option>
+                <option value="12">12 شهر</option>
+                <option value="13" selected>13 شهر</option>
+                <option value="14">14 شهر</option>
+                <option value="15">15 شهر</option>
+                <option value="16">16 شهر</option>
+                <option value="17">17 شهر</option>
+                <option value="18">18 شهر</option>
+            </select>
+        </div>
+       <div class="input-group">
+    <label for="downpayment">التسبيق (اختياري):</label>
+    <input type="number" 
+           id="downpayment" 
+           placeholder="أدخل مبلغ التسبيق" 
+           min="0" 
+           value="0"
+    >
+</div>
+        
+        <div class="result-box">
+            <p id="result">النتيجة ستظهر هنا</p>
+        </div>
+    </div>
+
+    <button class="reset-button" onclick="resetCalculator()">↺</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <!-- إضافة Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
