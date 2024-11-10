@@ -91,7 +91,234 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    
+
     </body>
 </html>
 
+ <script>
+        // تكوين Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEQLPyt8Wp0oA5pvgKz93dczqYsBNDpvY",
+            authDomain: "omrati-453e1.firebaseapp.com",
+            databaseURL: "https://omrati-453e1-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "omrati-453e1",
+            storageBucket: "omrati-453e1.appspot.com",
+            messagingSenderId: "211184940647",
+            appId: "1:211184940647:web:865a3a9810d8b45faf06c2",
+            measurementId: "G-RM7T583FYY"
+        };
+
+        // تهيئة Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+const PRICE_PER_PERSON = {
+    direct: {
+        shared: 168000,
+        quadruple: 178000,
+        triple: 198000,
+        double: 218000,
+        single: 318000
+    },
+    indirect: {
+        shared: 0,
+        quadruple: 0,
+        triple: 0,
+        double: 0,
+        single: 0
+    }
+};
+
+        const RATES = {
+            1: 0.17, 2: 0.17, 3: 0.2, 4: 0.22, 5: 0.24,
+            6: 0.27, 7: 0.3, 8: 0.34, 9: 0.38, 10: 0.42,
+            11: 0.46, 12: 0.5, 13: 0.52, 14: 0.57, 15: 0.62,
+            16: 0.67, 17: 0.72, 18: 0.77
+        };
+
+      function getRoomTypeText(roomType) {
+    const types = {
+        shared: 'غرفة جماعية',
+        quadruple: 'غرفة رباعية',
+        triple: 'غرفة ثلاثية',
+        double: 'غرفة ثنائية',
+        single: 'غرفة فردية'
+    };
+    return types[roomType];
+}
+
+      
+        function roundUpToNearest100(number) {
+            return Math.ceil(number / 100) * 100;
+        }
+
+        function formatNumber(number) {
+            return number.toLocaleString('en-US', {
+                useGrouping: true,
+                maximumFractionDigits: 0
+            });
+        }
+
+
+        const downpaymentInput = document.getElementById('downpayment');
+
+downpaymentInput.addEventListener('focus', function() {
+    if (this.value === '0') {
+        this.value = '';
+    }
+});
+
+downpaymentInput.addEventListener('blur', function() {
+    if (this.value === '') {
+        this.value = '0';
+        calculate();
+    }
+});
+
+        
+  function calculate() {
+    const resultBox = document.querySelector('.result-box');
+    resultBox.classList.add('loading');
+    
+    setTimeout(() => {
+        const flightType = document.getElementById('flightType').value;
+        const roomType = document.getElementById('roomType').value;
+        const persons = parseInt(document.getElementById('persons').value);
+        const months = parseInt(document.getElementById('months').value);
+        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+
+        const pricePerPerson = PRICE_PER_PERSON[flightType][roomType];
+        const totalPrice = persons * pricePerPerson;
+
+        if (downpayment > totalPrice) {
+            document.getElementById('result').innerHTML = 'مبلغ التسبيق أكبر من السعر الإجمالي';
+            return;
+        }
+
+
+                const remainingAmount = totalPrice - downpayment;
+                let monthlyRate = RATES[months] || 0.17;
+
+                if (remainingAmount >= 200000) {
+                    monthlyRate *= 0.8;
+                } else if (remainingAmount >= 100000) {
+                    monthlyRate *= 0.9;
+                }
+
+                const totalWithProfit = remainingAmount * (1 + monthlyRate);
+                const regularMonthlyPayment = roundUpToNearest100(Math.floor(totalWithProfit / months));
+                const lastMonthPayment = roundUpToNearest100(totalWithProfit - (regularMonthlyPayment * (months - 1)));
+
+                resultBox.classList.remove('loading');
+                resultBox.classList.remove('pulse');
+                void resultBox.offsetWidth; // Trigger reflow
+                resultBox.classList.add('pulse');
+
+        document.getElementById('result').innerHTML = `
+            نوع الرحلة: ${flightType === 'direct' ? 'مباشر' : 'غير مباشر'} <br>
+            نوع الغرفة: ${getRoomTypeText(roomType)} <br>
+            القسط الشهري: ${formatNumber(regularMonthlyPayment)} <br>
+            إجمالي المبلغ: ${formatNumber(regularMonthlyPayment * months)}
+        `;
+    }, 300);
+}
+
+
+      function resetCalculator() {
+    document.getElementById('flightType').value = 'direct';
+    document.getElementById('roomType').value = 'shared';
+    document.getElementById('persons').value = '1';
+    document.getElementById('months').value = '13';
+    document.getElementById('downpayment').value = '0';
+    document.getElementById('result').innerHTML = 'النتيجة ستظهر هنا';
+    calculate();
+}
+
+
+
+        // دالة لزيادة عدد الزيارات
+        function incrementVisitorCount() {
+    const visitorId = localStorage.getItem('visitorId');
+    if (!visitorId) {
+        // إذا لم يكن هناك معرف للزائر، قم بإنشاء واحد جديد
+        const newVisitorId = Date.now().toString();
+        localStorage.setItem('visitorId', newVisitorId);
+        
+        const visitorRef = database.ref('visitorCount');
+        visitorRef.transaction((currentCount) => {
+            return (currentCount || 0) + 1;
+        }, (error, committed, snapshot) => {
+            if (error) {
+                console.error('فشل تحديث العدّاد:', error);
+            } else if (committed) {
+                document.getElementById('visitorCount').textContent = snapshot.val();
+            }
+        });
+    } else {
+        // إذا كان هناك معرف للزائر، فقط قم بعرض العدد الحالي
+        displayVisitorCount();
+    }
+}
+
+        // دالة لعرض عدد الزيارات
+        function displayVisitorCount() {
+            const visitorRef = database.ref('visitorCount');
+            visitorRef.on('value', (snapshot) => {
+                document.getElementById('visitorCount').textContent = snapshot.val();
+            }, (error) => {
+                console.error('فشل جلب عدد الزيارات:', error);
+            });
+        }
+
+        // تأثيرات حركية باستخدام GSAP
+        function initAnimations() {
+            gsap.from('.calculator', {duration: 1, opacity: 0, y: 50, ease: 'power3.out'});
+            gsap.from('.input-group', {duration: 0.8, opacity: 0, y: 20, stagger: 0.2, ease: 'power3.out'});
+            gsap.from('.result-box', {duration: 1, opacity: 0, scale: 0.9, ease: 'elastic.out(1, 0.5)', delay: 0.5});
+            gsap.from('.visitor-count', {duration: 1, opacity: 0, x: -50, ease: 'power3.out', delay: 1});
+        }
+
+        // Event Listeners
+        document.querySelector('.calculator').addEventListener('change', function(event) {
+            if (event.target.matches('select, input')) {
+                calculate();
+            }
+        });
+
+
+
+function changeColor() {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    document.getElementById('visitorCount').style.backgroundColor = randomColor;
+}
+
+setInterval(changeColor, 3000);
+
+        
+        // تأثيرات حركية للمدخلات
+        const inputs = document.querySelectorAll('select, input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.style.transform = 'translateZ(30px)';
+            });
+            
+            input.addEventListener('blur', () => {
+                input.parentElement.style.transform = 'translateZ(20px)';
+            });
+        });
+
+        // إضافة مستمع الحدث لعنصر نوع الرحلة
+        document.getElementById('flightType').addEventListener('change', calculate);
+
+        window.addEventListener('load', () => {
+            calculate();
+            incrementVisitorCount();
+            displayVisitorCount();
+            initAnimations();
+        });
+    </script>
+</body>
+</html>
 
