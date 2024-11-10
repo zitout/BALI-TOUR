@@ -6,7 +6,110 @@
     <title>حاسبة تقسيط العمرة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        font-family: 'Tajawal', sans-serif;
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 500px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        text-align: center;
+    }
+
+    .user-type-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .user-type-buttons button {
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #90CAF9, #64B5F6);
+        color: white;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    .user-type-buttons button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .admin-login-form {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-top: 2rem;
+        display: none;
+    }
+
+    .admin-login-form input {
+        width: 100%;
+        max-width: 300px;
+        margin: 1rem auto;
+        padding: 12px;
+        border: 2px solid #E3F2FD;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        text-align: center;
+        direction: ltr;
+    }
+
+    .admin-login-form button {
+        margin-top: 1rem;
+        padding: 0.8rem 2rem;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    .admin-login-form button:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 480px) {
+        .login-container { padding: 1rem; }
+        .user-type-buttons {
+            flex-direction: column;
+        }
+        .user-type-buttons button {
+            width: 100%;
+        }
+    }
+</style>
     
 </head>
 <body>
