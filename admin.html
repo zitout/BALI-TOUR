@@ -407,10 +407,14 @@
 </html>
 
 <script>
-    // التحقق من تسجيل دخول المدير
-    if (!sessionStorage.getItem('adminLoggedIn')) {
-        window.location.href = 'index.html';
-    }
+       // التحقق من تسجيل الدخول في بداية الصفحة مباشرة
+    (function checkAuth() {
+        if (!sessionStorage.getItem('adminLoggedIn')) {
+            // إذا لم يكن هناك تسجيل دخول، قم بالتوجيه فوراً
+            window.location.replace('index.html');
+        }
+    })();
+
 
     // تكوين Firebase
     const firebaseConfig = {
